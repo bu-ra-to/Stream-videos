@@ -7,6 +7,7 @@ import {
   EDIT_STREAM,
   DELETE_STREAM
 } from './types';
+import history from '../history';
 import streams from '../apis/streams';
 export const signInaction = userId => {
   return {
@@ -18,9 +19,15 @@ export const signOutaction = () => {
   return { type: SIGN_OUT };
 };
 
-export const createStream = formValues => async dispatch => {
-  const responce = await streams.post('/streams', formValues);
+export const createStream = formValues => async (dispatch, getState) => {
+  const { userId } = getState().authReducer;
+  const responce = await streams.post('/streams', {
+    ...formValues,
+    userId,
+    Smuser: 'Hello'
+  });
   dispatch({ type: CREATE_STREAM, payload: responce.data });
+  history.push('/');
 };
 export const fetchStream = id => async dispatch => {
   const responce = await streams.get(`/streams/${id}`);
@@ -31,8 +38,9 @@ export const fetchStreams = () => async dispatch => {
   dispatch({ type: FETCH_STREAMS, payload: responce.data });
 };
 export const editStream = (id, formValues) => async dispatch => {
-  const responce = await streams.put(`/streams/${id}`, formValues);
+  const responce = await streams.patch(`/streams/${id}`, formValues);
   dispatch({ type: EDIT_STREAM, payload: responce.data });
+  history.push('/');
 };
 export const deleteStream = id => async dispatch => {
   await streams.delete(`/streams/${id}`);
