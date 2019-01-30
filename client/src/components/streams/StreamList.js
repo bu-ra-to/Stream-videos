@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { fetchStreams } from '../../actions';
+import { fetchStreams, fetchStream } from '../../actions';
 
 class StreamList extends React.Component {
   componentDidMount() {
@@ -13,16 +13,17 @@ class StreamList extends React.Component {
     if (userId === currentUserId) {
       return (
         <div className="right floated content">
-          <Link to={`/streams/delete/${id}`} className="ui button negative">
-            Delete
-          </Link>
           <Link to={`/streams/edit/${id}`} className="ui button primary">
             Edit
+          </Link>
+          <Link to={`/streams/delete/${id}`} className="ui button negative">
+            Delete
           </Link>
         </div>
       );
     }
   }
+
   renderList() {
     return this.props.streams.map(stream => {
       return (
@@ -30,7 +31,9 @@ class StreamList extends React.Component {
           {this.renderAdmin(stream)}
           <i className="large middle alligned icon camera" />
           <div className="content">
-            {stream.title}
+            <Link to={`/streams/${stream.id}`} className="header">
+              {stream.title}
+            </Link>
             <div className="description">{stream.description}</div>
           </div>
         </div>
@@ -49,6 +52,7 @@ class StreamList extends React.Component {
       );
     }
   }
+
   render() {
     return (
       <div>
@@ -59,7 +63,8 @@ class StreamList extends React.Component {
     );
   }
 }
-const mapState = state => {
+const mapState = (state, ownProps) => {
+  // console.log(state)??;
   return {
     streams: Object.values(state.streams),
     currentUserId: state.authReducer.userId,
@@ -68,5 +73,5 @@ const mapState = state => {
 };
 export default connect(
   mapState,
-  { fetchStreams }
+  { fetchStreams, fetchStream }
 )(StreamList);
